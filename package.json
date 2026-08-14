@@ -12,7 +12,46 @@
   "categories": [
     "Programming Languages"
   ],
+  "main": "./src/extension.js",
+  "activationEvents": [
+    "onLanguage:latex",
+    "onLanguage:tex"
+  ],
   "contributes": {
+    "commands": [
+      {
+        "command": "tikz.rebuildStyleIndex",
+        "title": "TikZ: Rebuild style index"
+      }
+    ],
+    "semanticTokenTypes": [
+      {
+        "id": "tikzMacro",
+        "superType": "variable",
+        "description": "A control sequence defined in this file with \\def, \\newcommand or \\pgfmathsetmacro."
+      },
+      {
+        "id": "tikzStyle",
+        "superType": "type",
+        "description": "A pgfkeys style defined by name/.style anywhere in the workspace."
+      }
+    ],
+    "semanticTokenScopes": [
+      {
+        "language": "latex",
+        "scopes": {
+          "tikzMacro": ["variable.other.tikz"],
+          "tikzStyle": ["entity.name.type.tikz"]
+        }
+      },
+      {
+        "language": "tex",
+        "scopes": {
+          "tikzMacro": ["variable.other.tikz"],
+          "tikzStyle": ["entity.name.type.tikz"]
+        }
+      }
+    ],
     "grammars": [
       {
         "scopeName": "tikz.injection",
