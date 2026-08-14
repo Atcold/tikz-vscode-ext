@@ -1,0 +1,5 @@
+#!/bin/sh
+# Run a script under the Node runtime bundled inside VS Code's Electron.
+# This machine has no standalone node/npm, and none is needed: the extension has zero
+# runtime dependencies, and the tokeniser harness borrows VS Code's own libraries.
+exec env ELECTRON_RUN_AS_NODE=1 "/Applications/Visual Studio Code.app/Contents/MacOS/Code" "$@"
