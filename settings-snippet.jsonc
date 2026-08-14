@@ -14,7 +14,16 @@
   // "[Theme Name]" key, forces it on for every theme you use now or later.
   // ---------------------------------------------------------------------------------
   "editor.semanticTokenColorCustomizations": {
-    "enabled": true
+    "enabled": true,
+
+    // Font weight for the two semantic token types. These come from the provider, not
+    // the grammar, so textMateRules cannot reach them -- they have to be styled here.
+    // Only fontStyle is given, so each theme keeps its own colours, and "" is again
+    // what means plain.
+    "rules": {
+      "tikzMacro": { "fontStyle": "" },
+      "tikzStyle": { "fontStyle": "" }
+    }
   },
 
   // ---------------------------------------------------------------------------------
