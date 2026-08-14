@@ -20,6 +20,10 @@
   "contributes": {
     "commands": [
       {
+        "command": "tikz.build",
+        "title": "TikZ: Build and report"
+      },
+      {
         "command": "tikz.rebuildStyleIndex",
         "title": "TikZ: Rebuild style index"
       }

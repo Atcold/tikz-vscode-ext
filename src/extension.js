@@ -3,6 +3,7 @@
 const vscode = require('vscode');
 const { StyleIndex } = require('./styleIndex');
 const { TikzSemanticTokensProvider } = require('./semantic');
+const { runBuildAndReport } = require('./build');
 
 const LANGUAGES = ['latex', 'tex'];
 
@@ -21,6 +22,10 @@ async function activate(context) {
       ),
     );
   }
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('tikz.build', runBuildAndReport),
+  );
 
   context.subscriptions.push(
     vscode.commands.registerCommand('tikz.rebuildStyleIndex', async () => {
