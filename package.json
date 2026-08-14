@@ -1,0 +1,33 @@
+{
+  "name": "tikz-vscode-ext",
+  "displayName": "TikZ highlighting",
+  "description": "Fine-grained syntax highlighting for the TikZ graphical language inside LaTeX documents.",
+  "version": "0.1.0",
+  "publisher": "atcold",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "grammars": [
+      {
+        "scopeName": "tikz.injection",
+        "path": "./syntaxes/tikz-injection.tmLanguage.json",
+        "injectTo": [
+          "text.tex.latex"
+        ]
+      },
+      {
+        "scopeName": "tikz.toplevel",
+        "path": "./syntaxes/tikz-toplevel.tmLanguage.json",
+        "injectTo": [
+          "text.tex.latex"
+        ]
+      }
+    ]
+  }
+}
