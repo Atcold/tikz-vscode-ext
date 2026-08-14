@@ -72,7 +72,7 @@
       "comment": "name/.style = {...} and friends. Matched before #key so the handle does not read as an ordinary key.",
       "match": "([A-Za-z@][A-Za-z0-9 _@.+-]*?)\\s*(/\\.)(style\\s+\\d+\\s+args|style\\s+n\\s+args|append\\s+style|prefix\\s+style|style|code\\s+\\d+\\s+args|code|default|initial|value\\s+required|value\\s+forbidden|estore\\s+in|store\\s+in|is\\s+choice|list|add|forward\\s+to|search\\s+also)\\b",
       "captures": {
-        "1": { "name": "entity.name.function.style.tikz" },
+        "1": { "name": "entity.name.function.style.tikz entity.name.function.tikz" },
         "2": { "name": "punctuation.definition.handler.tikz" },
         "3": { "name": "keyword.other.handler.tikz" }
       }
@@ -82,7 +82,7 @@
       "comment": "Any word phrase followed by '='. Deliberately generic: this covers every built-in key (dash pattern, line width, minimum size, inner sep) and every custom one, with no vocabulary to maintain. The trailing [<>] catches 'shorten >='. A comma cannot appear in the class, so a key can never span two option items.",
       "match": "([A-Za-z@][A-Za-z0-9 _@./+-]*?(?:\\s*[<>])?)\\s*(=)",
       "captures": {
-        "1": { "name": "entity.other.attribute-name.tikz" },
+        "1": { "name": "entity.other.attribute-name.tikz variable.other.property.tikz" },
         "2": { "name": "keyword.operator.assignment.tikz" }
       }
     },
@@ -158,12 +158,12 @@
 
     "colour-before-mix": {
       "match": "\\b([A-Za-z][A-Za-z0-9]*)(?=\\s*!)",
-      "name": "support.constant.color.tikz"
+      "name": "support.constant.color.tikz constant.language.tikz variable.other.constant.tikz"
     },
 
     "colour-after-mix": {
       "match": "(?<=!)\\s*([A-Za-z][A-Za-z0-9]*)",
-      "name": "support.constant.color.tikz"
+      "name": "support.constant.color.tikz constant.language.tikz variable.other.constant.tikz"
     },
 
     "macro": {
@@ -176,7 +176,7 @@
     "bare-option": {
       "comment": "A valueless option or a style reference: 'thick', 'dashed', 'school axis', 'coloraqua'. Last resort, so anything with more structure has already been claimed.",
       "match": "[A-Za-z@][A-Za-z0-9_@.-]*(?:[ ]+[A-Za-z0-9_@.-]+)*",
-      "name": "support.function.tikz"
+      "name": "support.function.tikz entity.name.function.tikz"
     }
   }
 }

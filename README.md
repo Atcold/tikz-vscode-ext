@@ -60,22 +60,31 @@ The extension ships no palette. Every token maps to a conventional TextMate scop
 dimension the colour of a numeric literal, and so on. Switch themes and the highlighting
 follows. The `.tikz` suffix is there as a hand-tuning hook, not a requirement.
 
+Some tokens carry more than one scope. The first says what the token *is* in
+conventional terms; the rest are fallbacks that more themes happen to style. Scope
+choices were made by measurement, not taste — `tools/theme-check.mjs` resolves each
+token against a theme the way the editor does, and every scope set below is styled by
+all 39 themes installed here, light and dark, giving four to seven distinct colours
+depending on the theme.
+
 | Token | Scope |
 |---|---|
-| option key before `=` | `entity.other.attribute-name.tikz` |
+| option key before `=` | `entity.other.attribute-name.tikz` + `variable.other.property.tikz` |
 | `=` | `keyword.operator.assignment.tikz` |
 | arrow tips `->` `<->` `-Stealth` | `keyword.operator.arrow.tikz` |
 | path joins `--` `\|-` `-\|` `..controls` | `keyword.operator.path.tikz` |
 | dimensions `2cm` `.5pt` | `constant.numeric.dimension.tikz`, unit `keyword.other.unit.tikz` |
-| bare option or style reference | `support.function.tikz` |
+| bare option or style reference | `support.function.tikz` + `entity.name.function.tikz` |
 | path operators `rectangle` `circle` `plot` | `keyword.control.path.tikz` |
 | `[` `]` | `punctuation.section.options.{begin,end}.tikz` |
 | `(` `)` | `punctuation.section.coordinate.{begin,end}.tikz` |
 | named coordinate | `variable.other.coordinate.tikz` |
 | `{` `}` in an option value | `punctuation.section.group.{begin,end}.tikz` |
 | `;` | `punctuation.terminator.tikz` |
-| colour mix `red!50!black` | `support.constant.color.tikz`, `!` as `keyword.operator.mix.tikz` |
-| `name/.style` | `entity.name.function.style.tikz` + `keyword.other.handler.tikz` |
+| colour mix `red!50!black` | `support.constant.color.tikz` + `constant.language.tikz` + `variable.other.constant.tikz`, `!` as `keyword.operator.mix.tikz` |
+| `name/.style` | `entity.name.function.style.tikz` + `entity.name.function.tikz`, handle as `keyword.other.handler.tikz` |
+| `\def`'ed macro (semantic) | `variable.other.tikz` |
+| style reference (semantic) | `entity.name.type.tikz` |
 
 ## Testing
 
@@ -95,6 +104,9 @@ harness tokenises with the exact engine the editor uses.
 
 # what the semantic provider would highlight, without running VS Code
 ./tools/tm tools/symbols-check.mjs path/to/figure.tex --index ~/Book/latex
+
+# which of our scopes a theme actually has a colour for
+./tools/tm tools/theme-check.mjs ~/.vscode/extensions/*/themes/*.json
 ```
 
 `audit.mjs` is the important one. A begin/end rule whose end never matches swallows the
