@@ -20,14 +20,17 @@
   // ---------------------------------------------------------------------------------
   // OPTIONAL. Delete this whole block if you would rather stay purely theme-driven.
   //
-  // Most themes leave punctuation at the default foreground, so the three kinds of
-  // delimiter end up correctly *scoped* but not visibly distinct. These are the only
-  // literal colours in the project. Keyed on "*" so they apply to every theme; the
-  // greys are chosen to sit between comment and foreground in both light and dark.
+  // The maths rules below are not optional if you dislike bold maths; the punctuation
+  // colours at the end are. Most themes leave punctuation at the default foreground, so
+  // the three kinds of delimiter end up correctly *scoped* but not visibly distinct.
+  // Those greys are the only literal colours in the project.
+  //
+  // Note the shape: textMateRules goes at the TOP LEVEL, which is what applies to every
+  // theme. A nested key is only read when it is a theme scope in square brackets, like
+  // "[Aether Neptune]". Anything else -- "*" included -- is silently ignored.
   // ---------------------------------------------------------------------------------
   "editor.tokenColorCustomizations": {
-    "*": {
-      "textMateRules": [
+    "textMateRules": [
         // -----------------------------------------------------------------------------
         // Font weight. Only fontStyle is set, never a foreground, so the theme keeps its
         // colours and these rules survive a theme change.
@@ -80,7 +83,6 @@
           "scope": "punctuation.terminator.tikz",
           "settings": { "foreground": "#e05f5f", "fontStyle": "bold" }
         }
-      ]
-    }
+    ]
   }
 }
