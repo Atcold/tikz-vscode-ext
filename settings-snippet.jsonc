@@ -1,0 +1,63 @@
+// Settings for tikz-vscode-ext, to merge into your VS Code user settings.json.
+//
+// Nothing here names a theme. The grammar maps TikZ onto conventional TextMate scopes,
+// so an option key is coloured like an HTML attribute, a dimension like a numeric
+// literal, a path operator like a keyword — switch themes and the TikZ highlighting
+// follows, with no palette to maintain.
+
+{
+  // ---------------------------------------------------------------------------------
+  // REQUIRED. Without this the \def and style highlighting is computed and discarded.
+  //
+  // A theme opts into semantic highlighting with a "semanticHighlighting": true flag in
+  // its own JSON, and many omit or disable it. Setting this at the top level, with no
+  // "[Theme Name]" key, forces it on for every theme you use now or later.
+  // ---------------------------------------------------------------------------------
+  "editor.semanticTokenColorCustomizations": {
+    "enabled": true
+  },
+
+  // ---------------------------------------------------------------------------------
+  // OPTIONAL. Delete this whole block if you would rather stay purely theme-driven.
+  //
+  // Most themes leave punctuation at the default foreground, so the three kinds of
+  // delimiter end up correctly *scoped* but not visibly distinct. These are the only
+  // literal colours in the project. Keyed on "*" so they apply to every theme; the
+  // greys are chosen to sit between comment and foreground in both light and dark.
+  // ---------------------------------------------------------------------------------
+  "editor.tokenColorCustomizations": {
+    "*": {
+      "textMateRules": [
+        {
+          "name": "TikZ: option brackets [ ]",
+          "scope": [
+            "punctuation.section.options.begin.tikz",
+            "punctuation.section.options.end.tikz"
+          ],
+          "settings": { "foreground": "#e0a458" }
+        },
+        {
+          "name": "TikZ: coordinate parentheses ( )",
+          "scope": [
+            "punctuation.section.coordinate.begin.tikz",
+            "punctuation.section.coordinate.end.tikz"
+          ],
+          "settings": { "foreground": "#7bb0d6" }
+        },
+        {
+          "name": "TikZ: value braces { }",
+          "scope": [
+            "punctuation.section.group.begin.tikz",
+            "punctuation.section.group.end.tikz"
+          ],
+          "settings": { "foreground": "#9a8fbe" }
+        },
+        {
+          "name": "TikZ: statement terminator ;",
+          "scope": "punctuation.terminator.tikz",
+          "settings": { "foreground": "#e05f5f", "fontStyle": "bold" }
+        }
+      ]
+    }
+  }
+}
