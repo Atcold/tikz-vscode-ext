@@ -28,6 +28,29 @@
   "editor.tokenColorCustomizations": {
     "*": {
       "textMateRules": [
+        // -----------------------------------------------------------------------------
+        // Font weight. Only fontStyle is set, never a foreground, so the theme keeps its
+        // colours and these rules survive a theme change.
+        //
+        // An empty string is required to clear bold. Omitting the key means "inherit
+        // from the theme", which changes nothing -- "" is what means "plain".
+        // -----------------------------------------------------------------------------
+        {
+          "name": "LaTeX: maths delimiters \\( \\) and $ $ are not bold",
+          "scope": [
+            "support.class.math.block.environment.latex",
+            "support.class.math.block.tex"
+          ],
+          "settings": { "fontStyle": "" }
+        },
+        {
+          // Ancestor-qualified deliberately: support.function.general.tex is also \draw,
+          // \node and \tikzset out in the picture, and those stay bold.
+          "name": "LaTeX: control sequences inside maths are not bold",
+          "scope": "meta.math.block support.function.general.tex",
+          "settings": { "fontStyle": "" }
+        },
+
         {
           "name": "TikZ: option brackets [ ]",
           "scope": [
