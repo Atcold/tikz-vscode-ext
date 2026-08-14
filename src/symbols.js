@@ -208,8 +208,15 @@ function optionItemNames(text, region) {
   let i = region.start;
 
   while (i < region.end) {
-    // Skip leading separators and whitespace.
-    while (i < region.end && /[\s,]/.test(text[i])) i++;
+    // Skip leading separators, whitespace and comments. Comments matter: a style
+    // definition preceded by a comment line would otherwise start its name at the '%'
+    // and swallow the comment, so the name never matches the index and the definition
+    // silently goes unhighlighted.
+    for (;;) {
+      while (i < region.end && /[\s,]/.test(text[i])) i++;
+      if (i < region.end && text[i] === '%') { i = pastComment(text, i); continue; }
+      break;
+    }
     if (i >= region.end) break;
 
     const start = i;

@@ -108,8 +108,17 @@
     },
 
     "path-operator": {
-      "match": "(?<![\\\\\\w])(rectangle|circle|ellipse|arc|grid|parabola|cycle|coordinate|node|child|edge|foreach|graph|chain|decorate|plot|to|pic|svg|let|in)(?![\\w])",
-      "name": "keyword.control.path.tikz"
+      "patterns": [
+        {
+          "match": "(?<![\\\\\\w])(rectangle|circle|ellipse|arc|grid|parabola|cycle|coordinate|node|child|edge|foreach|graph|chain|decorate|plot|to|pic|svg|let|in)(?![\\w])",
+          "name": "keyword.control.path.tikz"
+        },
+        {
+          "comment": "'at' and 'and' are ordinary English, and node text is not excluded from this injection, so they are only claimed when a coordinate follows -- which is the only way TikZ ever uses them.",
+          "match": "(?<![\\\\\\w])(at|and)(?![\\w])(?=\\s*\\()",
+          "name": "keyword.control.path.tikz"
+        }
+      ]
     },
 
     "coordinate": {
@@ -174,8 +183,8 @@
     },
 
     "bare-option": {
-      "comment": "A valueless option or a style reference: 'thick', 'dashed', 'school axis', 'coloraqua'. Last resort, so anything with more structure has already been claimed.",
-      "match": "[A-Za-z@][A-Za-z0-9_@.-]*(?:[ ]+[A-Za-z0-9_@.-]+)*",
+      "comment": "A valueless option or a style reference: 'thick', 'dashed', 'school axis', 'coloraqua'. Last resort, so anything with more structure has already been claimed. Every word must begin with a letter: TextMate takes the earliest match, not the first listed rule, so allowing a digit-led continuation let this swallow the numbers in 'dash pattern=on 1.6pt off 1.3pt' before #dimension could reach them.",
+      "match": "[A-Za-z@][A-Za-z0-9_@.-]*(?:[ ]+[A-Za-z@][A-Za-z0-9_@.-]*)*",
       "name": "support.function.tikz entity.name.function.tikz"
     }
   }
