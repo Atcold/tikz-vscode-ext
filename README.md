@@ -32,6 +32,35 @@ opts into semantic highlighting itself and many ship with it off, in which case 
 There is no build step and nothing to install — no TypeScript, no npm, no dependencies
 beyond the `vscode` API.
 
+## Building from the editor
+
+`TikZ: Build and report` (`tikz.build`) runs your project's build script and reports the
+outcome as a notification. It picks the script from the file you are looking at: one in
+a figure folder gets the figure script, anything else gets the document script.
+
+It runs the script directly rather than through a VS Code task. A task spawns a terminal,
+clears it and reports back through the task-process event, which costs about as long
+again as a short build — two seconds on top of two here. The trade is that there is no
+terminal transcript, so the script should say what happened: write one line to
+`build/.build-status` reading `ok <message>` or `fail <message>` and that message goes
+into the notification. Without the file, the exit code is used instead.
+
+Bind it to a key, saving first, in `keybindings.json`:
+
+```jsonc
+{
+  "key": "f6",
+  "command": "runCommands",
+  "args": { "commands": ["workbench.action.files.saveAll", "tikz.build"] },
+  "when": "!terminalFocus"
+}
+```
+
+Four settings control it, defaulting to the layout this was written against:
+`tikz.figureScript` (`./fig.sh`), `tikz.buildScript` (`./build.sh`), `tikz.figureFolders`
+(a regex matching `*-figs`, `tikz-figs`, `tikz-code`) and `tikz.scriptFolders` (`.` then
+`latex`). If no script is found, the command falls back to the default build task.
+
 ## Two halves
 
 **A TextMate grammar injection** handles everything decidable from the text in front of
@@ -88,7 +117,7 @@ depending on the theme.
 
 ## Testing
 
-There is no node on this machine and none is needed. VS Code ships Electron (a Node
+No node or npm is needed. VS Code ships Electron (a Node
 runtime), `vscode-textmate` and `vscode-oniguruma`, so `tools/tm` borrows them and the
 harness tokenises with the exact engine the editor uses.
 
@@ -100,10 +129,10 @@ harness tokenises with the exact engine the editor uses.
 ./tools/tm tools/tokenize.mjs path/to/figure.tex --raw
 
 # sweep a corpus for begin/end rules left open at EOF
-./tools/tm tools/audit.mjs ~/Book/latex/**/*.tex
+./tools/tm tools/audit.mjs path/to/latex/**/*.tex
 
 # what the semantic provider would highlight, without running VS Code
-./tools/tm tools/symbols-check.mjs path/to/figure.tex --index ~/Book/latex
+./tools/tm tools/symbols-check.mjs path/to/figure.tex --index path/to/latex
 
 # which of our scopes a theme actually has a colour for
 ./tools/tm tools/theme-check.mjs ~/.vscode/extensions/*/themes/*.json
