@@ -21,7 +21,8 @@ file defines it two lines up.
 ## Install
 
 ```sh
-ln -s "$PWD" ~/.vscode/extensions/tikz-vscode-ext
+./tools/package
+code --install-extension tikz-vscode-ext-0.1.0.vsix
 ```
 
 Reload the window, then merge `settings-snippet.jsonc` into your user `settings.json`.
@@ -29,8 +30,16 @@ The `editor.semanticTokenColorCustomizations.enabled` line in it is **required**
 opts into semantic highlighting itself and many ship with it off, in which case the
 `\def` highlighting is computed and then discarded. The rest of that file is optional.
 
-There is no build step and nothing to install — no TypeScript, no npm, no dependencies
-beyond the `vscode` API.
+Symlinking the checkout into `~/.vscode/extensions` used to be enough and no longer is.
+VS Code takes `~/.vscode/extensions/extensions.json` as the source of truth for what is
+installed, so a folder that is merely present gets `Marked extension as removed` in the
+shared-process log at startup and is then ignored — silently, from the editor's side.
+
+There is still no build step in any meaningful sense — no TypeScript, no npm, no
+dependency beyond the `vscode` API. `tools/package` is tar and zip: a `.vsix` is a zip
+holding the source under `extension/` beside two metadata files, and the installer reads
+those. For development, skip the install and run `code --extensionDevelopmentPath="$PWD"`,
+which loads the checkout itself into a second window.
 
 ## Building from the editor
 
