@@ -15,7 +15,9 @@
   "main": "./src/extension.js",
   "activationEvents": [
     "onLanguage:latex",
-    "onLanguage:tex"
+    "onLanguage:tex",
+    "onCommand:tikz.build",
+    "onCommand:tikz.rebuildStyleIndex"
   ],
   "contributes": {
     "commands": [
