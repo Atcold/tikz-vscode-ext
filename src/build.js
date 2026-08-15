@@ -26,6 +26,16 @@ const TIMEOUT_MS = 10 * 60 * 1000;
  * does something sensible in a project that has none.
  */
 async function runBuildAndReport() {
+  try {
+    await build();
+  } catch (err) {
+    // Bound to a key with no terminal behind it, so an unhandled throw would
+    // otherwise surface as a bare stack trace with no clue which step failed.
+    vscode.window.showErrorMessage(`TikZ build error: ${err?.message ?? err}`);
+  }
+}
+
+async function build() {
   const folder = vscode.workspace.workspaceFolders?.[0];
   if (!folder) {
     vscode.window.showErrorMessage('TikZ: no folder open, nothing to build.');
@@ -69,7 +79,7 @@ async function choose(folder) {
     FIGURE_DIR.test(path.dirname(active.uri.fsPath));
 
   for (const dir of SCRIPT_DIRS) {
-    const cwd = path.join(folder.uri.fsPath, dir);
+    const cwd = path.join(folder.fsPath, dir);
     if (isFigure && (await exists(path.join(cwd, 'fig.sh')))) {
       return {
         script: './fig.sh',
