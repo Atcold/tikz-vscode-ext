@@ -4,14 +4,29 @@ const vscode = require('vscode');
 const { execFile } = require('node:child_process');
 const path = require('node:path');
 
-// The folder opened in the editor may be the repository root or the latex/ directory
-// inside it, so look for the scripts in both.
-const SCRIPT_DIRS = ['.', 'latex'];
-
-// A figure lives in one of these; anything else is a document build.
-const FIGURE_DIR = /(?:^|\/)(?:[A-Za-z0-9_]+-figs|tikz-figs|tikz-code)$/;
-
 const TIMEOUT_MS = 10 * 60 * 1000;
+
+/**
+ * Which scripts to run, and how to tell a figure from a document. The defaults match
+ * the layout this was written against; they are settings so the extension is not
+ * silently shaped by one project's conventions.
+ */
+function config() {
+  const c = vscode.workspace.getConfiguration('tikz');
+  let figureFolders;
+  try {
+    figureFolders = new RegExp(`(?:^|/)(?:${c.get('figureFolders')})$`);
+  } catch {
+    vscode.window.showWarningMessage('TikZ: tikz.figureFolders is not a valid regular expression.');
+    figureFolders = /(?!)/;
+  }
+  return {
+    figureScript: c.get('figureScript'),
+    buildScript: c.get('buildScript'),
+    scriptFolders: c.get('scriptFolders'),
+    figureFolders,
+  };
+}
 
 /**
  * Build, and report the outcome as a notification.
@@ -72,24 +87,26 @@ async function build() {
  * @returns {Promise<{script: string, args: string[], cwd: string, label: string} | null>}
  */
 async function choose(folder) {
+  const { figureScript, buildScript, scriptFolders, figureFolders } = config();
+
   const active = vscode.window.activeTextEditor?.document;
   const isFigure =
     active?.languageId &&
     /^(latex|tex)$/.test(active.languageId) &&
-    FIGURE_DIR.test(path.dirname(active.uri.fsPath));
+    figureFolders.test(path.dirname(active.uri.fsPath));
 
-  for (const dir of SCRIPT_DIRS) {
+  for (const dir of scriptFolders) {
     const cwd = path.join(folder.fsPath, dir);
-    if (isFigure && (await exists(path.join(cwd, 'fig.sh')))) {
+    if (isFigure && (await exists(path.join(cwd, figureScript)))) {
       return {
-        script: './fig.sh',
+        script: figureScript,
         args: [active.uri.fsPath],
         cwd,
         label: `preview ${path.basename(active.uri.fsPath, '.tex')}`,
       };
     }
-    if (await exists(path.join(cwd, 'build.sh'))) {
-      return { script: './build.sh', args: [], cwd, label: 'build' };
+    if (await exists(path.join(cwd, buildScript))) {
+      return { script: buildScript, args: [], cwd, label: 'build' };
     }
   }
   return null;

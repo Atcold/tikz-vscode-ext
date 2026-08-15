@@ -30,6 +30,37 @@
         "title": "TikZ: Rebuild style index"
       }
     ],
+    "configuration": {
+      "title": "TikZ",
+      "properties": {
+        "tikz.figureScript": {
+          "type": "string",
+          "default": "./fig.sh",
+          "description": "Script run to preview a single figure. It is given the path of the active file, and run from the first folder that contains it (the workspace root, or a subfolder named in tikz.scriptFolders)."
+        },
+        "tikz.buildScript": {
+          "type": "string",
+          "default": "./build.sh",
+          "description": "Script run to build the whole document, when the active file is not a figure."
+        },
+        "tikz.figureFolders": {
+          "type": "string",
+          "default": "(?:[A-Za-z0-9_]+-figs|tikz-figs|tikz-code)",
+          "description": "Regular expression matching the name of a folder that holds figures. A file in one of these is previewed with tikz.figureScript rather than triggering a full build."
+        },
+        "tikz.scriptFolders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            ".",
+            "latex"
+          ],
+          "description": "Folders under the workspace root to search for the scripts, in order. Lets the sources sit in a subdirectory."
+        }
+      }
+    },
     "semanticTokenTypes": [
       {
         "id": "tikzMacro",
