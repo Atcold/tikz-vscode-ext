@@ -103,6 +103,17 @@ injection for `\tikzset{...}` blocks and inline `\tikz...;` outside any picture.
 Keys are matched *generically* — any word phrase before an `=` — rather than enumerated.
 That covers every built-in key and every custom one with no vocabulary to maintain.
 
+Maths is the one region the grammar takes over from the host and then deliberately does
+*not* highlight: `\(…\)`, `\[…\]` and `$…$` inside a picture become one flat
+`string.other.math.tikz`. The host's own scopes were the problem — a control sequence in
+maths is `constant.other.general.math.tex`, which themes colour from the same family as
+`variable`, the family a `\def`'ed macro already gets, so `\varepsilon` and `\eps` came
+out the same amber. Scoping maths as a string says the true thing about it — it is content
+in another language, not more TikZ — and no theme measured colours `string` like
+`variable`. The trade is the structure inside a formula: subscripts, digits and `\alpha`
+are now one colour. A figure's formula is a label a few characters long, and seeing where
+it starts and stops is worth more than colouring inside it.
+
 **A semantic token provider** handles what a grammar structurally cannot: symbols whose
 meaning depends on a definition elsewhere.
 
@@ -142,6 +153,7 @@ depending on the theme.
 | named coordinate | `variable.other.coordinate.tikz` |
 | `{` `}` in an option value | `punctuation.section.group.{begin,end}.tikz` |
 | `;` | `punctuation.terminator.tikz` |
+| maths `\(…\)` `$…$` | `string.other.math.tikz`, delimiters `punctuation.definition.string.{begin,end}.tikz` |
 | colour mix `red!50!black` | `support.constant.color.tikz` + `constant.language.tikz` + `variable.other.constant.tikz`, `!` as `keyword.operator.mix.tikz` |
 | `name/.style` | `entity.name.function.style.tikz` + `entity.name.function.tikz`, handle as `keyword.other.handler.tikz` |
 | `\def`'ed macro (semantic) | `variable.other.tikz` |

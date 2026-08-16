@@ -47,6 +47,8 @@
         // An empty string is required to clear bold. Omitting the key means "inherit
         // from the theme", which changes nothing -- "" is what means "plain".
         // -----------------------------------------------------------------------------
+        // These two reach maths in ordinary prose. Maths *inside* a picture is scoped
+        // by the extension itself, as string.other.math.tikz, and needs no rule here.
         {
           "name": "LaTeX: maths delimiters \\( \\) and $ $ are not bold",
           "scope": [

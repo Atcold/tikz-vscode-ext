@@ -11,6 +11,7 @@
     "picture-body": {
       "comment": "Path level: what a tikzpicture body looks like outside an option list. Shared with the toplevel grammar so an inline \\tikz...; one-liner is tokenised identically.",
       "patterns": [
+        { "include": "#maths" },
         { "include": "#option-list" },
         { "include": "#path-operator" },
         { "include": "#path-join" },
@@ -19,6 +20,40 @@
         { "include": "#separator" },
         { "include": "#dimension" },
         { "include": "#number" }
+      ]
+    },
+
+    "maths": {
+      "comment": "Maths is a different language embedded in the figure, and is scoped as one flat string so it reads as content rather than as more TikZ. The host grammar was doing this until now, and its scopes are the problem: a control sequence in maths is constant.other.general.math.tex, which nearly every theme colours from the same family as variable -- the family a \\def'ed macro already gets from the semantic provider. Two ambers, and no way to tell a macro from an \\varepsilon. A string scope is both distinct in every theme measured and what the host grammar half-says already, since it calls the delimiters punctuation.definition.string.\n\nThe cost is the internal structure of a formula: subscripts, digits and \\alpha are now one colour. In a figure a formula is a label a few characters long, and knowing where it begins and ends is worth more than colouring inside it.\n\nEvery rule bails out at \\end{...}, so an unclosed $ costs one label rather than the rest of the file.",
+      "patterns": [
+        {
+          "begin": "(\\\\\\()",
+          "beginCaptures": { "1": { "name": "punctuation.definition.string.begin.tikz" } },
+          "end": "(\\\\\\))|(?=\\\\end\\{)",
+          "endCaptures": { "1": { "name": "punctuation.definition.string.end.tikz" } },
+          "name": "string.other.math.tikz"
+        },
+        {
+          "begin": "(\\\\\\[)",
+          "beginCaptures": { "1": { "name": "punctuation.definition.string.begin.tikz" } },
+          "end": "(\\\\\\])|(?=\\\\end\\{)",
+          "endCaptures": { "1": { "name": "punctuation.definition.string.end.tikz" } },
+          "name": "string.other.math.tikz"
+        },
+        {
+          "begin": "(?<!\\\\)(\\$\\$)",
+          "beginCaptures": { "1": { "name": "punctuation.definition.string.begin.tikz" } },
+          "end": "(\\$\\$)|(?=\\\\end\\{)",
+          "endCaptures": { "1": { "name": "punctuation.definition.string.end.tikz" } },
+          "name": "string.other.math.tikz"
+        },
+        {
+          "begin": "(?<!\\\\)(\\$)",
+          "beginCaptures": { "1": { "name": "punctuation.definition.string.begin.tikz" } },
+          "end": "(?<!\\\\)(\\$)|(?=\\\\end\\{)",
+          "endCaptures": { "1": { "name": "punctuation.definition.string.end.tikz" } },
+          "name": "string.other.math.tikz"
+        }
       ]
     },
 
@@ -41,8 +76,7 @@
     "option-body": {
       "patterns": [
         { "include": "#comment" },
-        { "include": "text.tex.latex#inline-math" },
-        { "include": "text.tex.latex#display-math" },
+        { "include": "#maths" },
         { "include": "#style-handle" },
         { "include": "#key" },
         { "include": "#arrow" },
