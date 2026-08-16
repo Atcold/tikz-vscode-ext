@@ -26,11 +26,36 @@ const SCOPES = [
   ['colour', 'support.constant.color.tikz', 'constant.language.tikz', 'variable.other.constant.tikz'],
   ['style name', 'entity.name.function.style.tikz', 'entity.name.function.tikz'],
   ['style handle', 'keyword.other.handler.tikz'],
+  ['maths', 'string.other.math.tikz'],
   ['macro (semantic)', 'variable.other.tikz'],
   ['style (semantic)', 'entity.name.type.tikz'],
 ];
 
-const strip = (s) => s.replace(/^\s*\/\/.*$/gm, '').replace(/,(\s*[}\]])/g, '$1');
+// Themes are JSONC. A line-based comment strip is not enough -- VS Code's own themes
+// carry trailing // comments inside arrays, and a URL in a string looks exactly like the
+// start of one -- so this walks the text and skips over string literals.
+function strip(text) {
+  let out = '';
+  for (let i = 0; i < text.length; ) {
+    const c = text[i];
+    if (c === '"') {
+      let j = i + 1;
+      while (j < text.length && !(text[j] === '"' && text[j - 1] !== '\\')) j++;
+      out += text.slice(i, j + 1);
+      i = j + 1;
+    } else if (c === '/' && text[i + 1] === '/') {
+      while (i < text.length && text[i] !== '\n') i++;
+    } else if (c === '/' && text[i + 1] === '*') {
+      i += 2;
+      while (i < text.length && !(text[i] === '*' && text[i + 1] === '/')) i++;
+      i += 2;
+    } else {
+      out += c;
+      i++;
+    }
+  }
+  return out.replace(/,(\s*[}\]])/g, '$1');
+}
 
 function resolve(theme, scope) {
   let best = null;
@@ -63,18 +88,31 @@ function load(file, seen = new Set()) {
 
   const base = load(path.join(path.dirname(full), theme.include), seen);
   // Later rules win, so the including theme's own rules go last.
-  return { ...theme, tokenColors: [...(base.tokenColors ?? []), ...(theme.tokenColors ?? [])] };
+  return {
+    ...theme,
+    colors: { ...(base.colors ?? {}), ...(theme.colors ?? {}) },
+    tokenColors: [...(base.tokenColors ?? []), ...(theme.tokenColors ?? [])],
+  };
 }
+
+// A rule that matches is not the same as a colour you can see. Monokai styles bare
+// `variable` as #F8F8F2, which is its editor foreground, so a scope resolving through it
+// reads as ordinary text -- the failure this whole table exists to prevent, and the one a
+// match/no-match check walks straight past.
+const same = (a, b) => a && b && a.slice(0, 7).toLowerCase() === b.slice(0, 7).toLowerCase();
 
 for (const file of process.argv.slice(2)) {
   const theme = load(file);
+  const foreground = theme.colors?.['editor.foreground'];
   const resolved = SCOPES.map(([label, ...scopes]) => [
     label,
     scopes.map((s) => resolve(theme, s)).find(Boolean) ?? null,
   ]);
-  const missing = resolved.filter(([, c]) => !c);
-  const colours = new Set(resolved.map(([, c]) => c).filter(Boolean));
-  const tag = missing.length ? `\x1b[33m${missing.length} unstyled\x1b[0m` : '\x1b[32mall styled\x1b[0m';
+  const missing = resolved.filter(([, c]) => !c || same(c, foreground));
+  const colours = new Set(resolved.map(([, c]) => c).filter((c) => c && !same(c, foreground)));
+  const tag = missing.length ? `\x1b[33m${missing.length} as plain text\x1b[0m` : '\x1b[32mall styled\x1b[0m';
   console.log(`${path.basename(file).padEnd(34)} ${String(colours.size).padStart(2)} distinct colours, ${tag}`);
-  for (const [label] of missing) console.log(`    \x1b[33m- ${label}\x1b[0m`);
+  for (const [label, colour] of missing) {
+    console.log(`    \x1b[33m- ${label}${colour ? ` (${colour}, the foreground)` : ' (no rule)'}\x1b[0m`);
+  }
 }

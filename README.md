@@ -135,9 +135,21 @@ follows. The `.tikz` suffix is there as a hand-tuning hook, not a requirement.
 Some tokens carry more than one scope. The first says what the token *is* in
 conventional terms; the rest are fallbacks that more themes happen to style. Scope
 choices were made by measurement, not taste — `tools/theme-check.mjs` resolves each
-token against a theme the way the editor does, and every scope set below is styled by
-all 39 themes installed here, light and dark, giving four to seven distinct colours
+token against a theme the way the editor does. Of the 61 themes installed here, light and
+dark, 38 give every token below a colour of its own, four to nine distinct colours
 depending on the theme.
+
+The other 23 leave at least one token reading as ordinary text, and no choice of scope
+avoids that. A theme that has a rule for a scope has not necessarily given it a *visible*
+colour: Monokai styles bare `variable` as `#F8F8F2`, which is its own editor foreground,
+so a `\def`'ed macro comes out the colour of the surrounding text — as does a named
+coordinate, and in ten of the 61 themes. Scopes that would survive Monokai
+(`entity.name.function.preprocessor` reads as text in only one theme of the 61) collide
+with the bare-option colour in 37, which is worse: TikZ code is mostly bare options.
+
+So this is fixed per theme, in your own settings, and `theme-check` names what needs
+fixing — it reports a token whose colour equals the editor foreground as plain text
+rather than as styled. `settings-snippet.jsonc` carries a worked example for Monokai.
 
 | Token | Scope |
 |---|---|

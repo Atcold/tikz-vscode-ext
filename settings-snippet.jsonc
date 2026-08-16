@@ -16,6 +16,21 @@
   "editor.semanticTokenColorCustomizations": {
     "enabled": true,
 
+    // A theme-name key applies to that theme alone, and is how to rescue a token the
+    // theme leaves the colour of ordinary text. Monokai styles bare `variable` as
+    // #F8F8F2 -- its own editor foreground -- so a \def'ed macro is invisible as a
+    // macro; #FD971F is Monokai's parameter orange, which TikZ does not otherwise use.
+    // Ten of the 61 themes measured here need this. Run
+    //   ./tools/tm tools/theme-check.mjs <theme.json>
+    // to see which of a theme's tokens read as plain text, then add a block like this.
+    "[Monokai]": {
+      "enabled": true,
+      "rules": {
+        "tikzMacro": { "foreground": "#FD971F", "fontStyle": "" },
+        "tikzStyle": { "fontStyle": "" }
+      }
+    },
+
     // Font weight for the two semantic token types. These come from the provider, not
     // the grammar, so textMateRules cannot reach them -- they have to be styled here.
     // Only fontStyle is given, so each theme keeps its own colours, and "" is again
@@ -39,6 +54,12 @@
   // "[Aether Neptune]". Anything else -- "*" included -- is silently ignored.
   // ---------------------------------------------------------------------------------
   "editor.tokenColorCustomizations": {
+    // Monokai's greys are olive: every background sits around hue 60 with 5-10%
+    // saturation, and the comment colour with them. `comments` is the shorthand for the
+    // comment scope; for the chrome, put the same treatment in
+    // "workbench.colorCustomizations": { "[Monokai]": { "editor.background": "#252525", … } }.
+    "[Monokai]": { "comments": "#7c7c7c" },
+
     "textMateRules": [
         // -----------------------------------------------------------------------------
         // Font weight. Only fontStyle is set, never a foreground, so the theme keeps its
