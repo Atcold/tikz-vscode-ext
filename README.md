@@ -70,6 +70,29 @@ Four settings control it, defaulting to the layout this was written against:
 (a regex matching `*-figs`, `tikz-figs`, `tikz-code`) and `tikz.scriptFolders` (`.` then
 `latex`). If no script is found, the command falls back to the default build task.
 
+## Viewing the PDF
+
+`TikZ: View the PDF` (`tikz.view`) hands the output to an external viewer — the figure
+PDF when you are in a figure, the document PDF otherwise. A build script can do this
+itself, but only has reason to when the output changed; editing the same figure over and
+over, or reading a chapter with the figure tab behind it, leaves the viewer showing
+something else. This forces it, which is the point of having it on its own key:
+
+```jsonc
+{
+  "key": "f7",
+  "command": "tikz.view",
+  "when": "!terminalFocus"
+}
+```
+
+The viewer is launched with `open -a`, so it comes to the front, and one already holding
+that file raises its tab rather than opening a second copy. `tikz.viewer` names the
+application; left empty it takes the newest `/Applications/texstudio*.app`, since that
+bundle carries its version in its name and is renamed on every upgrade. `tikz.figurePdf`
+(`build/fig.pdf`) and `tikz.documentPdf` (`build/main.pdf`) are resolved against the same
+`tikz.scriptFolders` as the scripts.
+
 ## Two halves
 
 **A TextMate grammar injection** handles everything decidable from the text in front of

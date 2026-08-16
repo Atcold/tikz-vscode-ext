@@ -24,6 +24,9 @@ function config() {
     figureScript: c.get('figureScript'),
     buildScript: c.get('buildScript'),
     scriptFolders: c.get('scriptFolders'),
+    figurePdf: c.get('figurePdf'),
+    documentPdf: c.get('documentPdf'),
+    viewer: c.get('viewer'),
     figureFolders,
   };
 }
@@ -89,20 +92,16 @@ async function build() {
 async function choose(folder) {
   const { figureScript, buildScript, scriptFolders, figureFolders } = config();
 
-  const active = vscode.window.activeTextEditor?.document;
-  const isFigure =
-    active?.languageId &&
-    /^(latex|tex)$/.test(active.languageId) &&
-    figureFolders.test(path.dirname(active.uri.fsPath));
+  const figure = activeFigure(figureFolders);
 
   for (const dir of scriptFolders) {
     const cwd = path.join(folder.fsPath, dir);
-    if (isFigure && (await exists(path.join(cwd, figureScript)))) {
+    if (figure && (await exists(path.join(cwd, figureScript)))) {
       return {
         script: figureScript,
-        args: [active.uri.fsPath],
+        args: [figure.uri.fsPath],
         cwd,
-        label: `preview ${path.basename(active.uri.fsPath, '.tex')}`,
+        label: `preview ${path.basename(figure.uri.fsPath, '.tex')}`,
       };
     }
     if (await exists(path.join(cwd, buildScript))) {
@@ -110,6 +109,20 @@ async function choose(folder) {
     }
   }
   return null;
+}
+
+/**
+ * The active document, when it is a figure rather than part of the document.
+ * @param {RegExp} figureFolders
+ * @returns {vscode.TextDocument | null}
+ */
+function activeFigure(figureFolders) {
+  const active = vscode.window.activeTextEditor?.document;
+  const isFigure =
+    active?.languageId &&
+    /^(latex|tex)$/.test(active.languageId) &&
+    figureFolders.test(path.dirname(active.uri.fsPath));
+  return isFigure ? active : null;
 }
 
 /** @param {{script: string, args: string[], cwd: string}} plan */
@@ -151,4 +164,78 @@ async function readStatus(cwd) {
   }
 }
 
-module.exports = { runBuildAndReport };
+/**
+ * Show the PDF for the file being edited in an external viewer.
+ *
+ * The build script may hand its output over itself, but only has reason to when the
+ * output changed. Rebuilding the same figure, or looking at a chapter while the figure
+ * tab sits behind it, leaves the viewer showing something else. This forces it: `open -a`
+ * both opens the file and raises the window, and a viewer already holding that file
+ * raises the tab rather than duplicating it.
+ */
+async function viewAndReport() {
+  try {
+    await view();
+  } catch (err) {
+    vscode.window.showErrorMessage(`TikZ view error: ${err?.message ?? err}`);
+  }
+}
+
+async function view() {
+  const folder = vscode.workspace.workspaceFolders?.[0];
+  if (!folder) {
+    vscode.window.showErrorMessage('TikZ: no folder open, nothing to view.');
+    return;
+  }
+
+  const { figurePdf, documentPdf, scriptFolders, figureFolders, viewer } = config();
+  const relative = activeFigure(figureFolders) ? figurePdf : documentPdf;
+
+  let pdf = null;
+  for (const dir of scriptFolders) {
+    const candidate = path.join(folder.uri.fsPath, dir, relative);
+    if (await exists(candidate)) {
+      pdf = candidate;
+      break;
+    }
+  }
+  if (!pdf) {
+    vscode.window.showWarningMessage(`TikZ: no ${relative} to view — build it first.`);
+    return;
+  }
+
+  const app = viewer || (await findTeXstudio());
+  if (!app) {
+    vscode.window.showErrorMessage('TikZ: no viewer found — set tikz.viewer.');
+    return;
+  }
+
+  const darwin = process.platform === 'darwin';
+  execFile(darwin ? 'open' : app, darwin ? ['-a', app, pdf] : [pdf], (error) => {
+    if (error) {
+      vscode.window.showErrorMessage(
+        `TikZ: could not view ${path.basename(pdf)} — ${error.message}`,
+      );
+    }
+  });
+}
+
+/**
+ * The bundle carries its version in its name, and so is renamed on every upgrade;
+ * hardcoding a path would break at the next one. Newest by name wins.
+ */
+async function findTeXstudio() {
+  if (process.platform !== 'darwin') return null;
+  try {
+    const entries = await vscode.workspace.fs.readDirectory(vscode.Uri.file('/Applications'));
+    const apps = entries
+      .map(([name]) => name)
+      .filter((name) => /^texstudio.*\.app$/i.test(name))
+      .sort();
+    return apps.length ? path.join('/Applications', apps[apps.length - 1]) : null;
+  } catch {
+    return null;
+  }
+}
+
+module.exports = { runBuildAndReport, viewAndReport };

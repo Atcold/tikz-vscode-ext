@@ -17,6 +17,7 @@
     "onLanguage:latex",
     "onLanguage:tex",
     "onCommand:tikz.build",
+    "onCommand:tikz.view",
     "onCommand:tikz.rebuildStyleIndex"
   ],
   "contributes": {
@@ -24,6 +25,10 @@
       {
         "command": "tikz.build",
         "title": "TikZ: Build and report"
+      },
+      {
+        "command": "tikz.view",
+        "title": "TikZ: View the PDF"
       },
       {
         "command": "tikz.rebuildStyleIndex",
@@ -47,6 +52,21 @@
           "type": "string",
           "default": "(?:[A-Za-z0-9_]+-figs|tikz-figs|tikz-code)",
           "description": "Regular expression matching the name of a folder that holds figures. A file in one of these is previewed with tikz.figureScript rather than triggering a full build."
+        },
+        "tikz.figurePdf": {
+          "type": "string",
+          "default": "build/fig.pdf",
+          "description": "PDF shown by TikZ: View the PDF when the active file is a figure, relative to the folder holding the scripts."
+        },
+        "tikz.documentPdf": {
+          "type": "string",
+          "default": "build/main.pdf",
+          "description": "PDF shown by TikZ: View the PDF otherwise, relative to the folder holding the scripts."
+        },
+        "tikz.viewer": {
+          "type": "string",
+          "default": "",
+          "description": "Application to show the PDF in. Empty means the newest /Applications/texstudio*.app, since the bundle is renamed on every upgrade."
         },
         "tikz.scriptFolders": {
           "type": "array",
