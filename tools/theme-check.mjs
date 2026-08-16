@@ -1,5 +1,6 @@
 // Does a theme actually have a colour for the scopes this grammar uses?
 //
+//   ./tools/tm tools/theme-check.mjs             # the theme you are using
 //   ./tools/tm tools/theme-check.mjs <theme.json>...
 //
 // Mapping TikZ onto conventional scopes is only worth anything if themes really style
@@ -101,7 +102,72 @@ function load(file, seen = new Set()) {
 // match/no-match check walks straight past.
 const same = (a, b) => a && b && a.slice(0, 7).toLowerCase() === b.slice(0, 7).toLowerCase();
 
-for (const file of process.argv.slice(2)) {
+/**
+ * The theme named in the user's settings, as a file. Given no argument, the question
+ * being asked is almost always "what about the theme I am looking at right now", and
+ * making someone find their theme's JSON by hand is how a checker goes unrun.
+ * @returns {string[]}
+ */
+function currentTheme() {
+  const home = process.env.HOME ?? process.env.USERPROFILE ?? '';
+  const settings = {
+    darwin: path.join(home, 'Library/Application Support/Code/User/settings.json'),
+    win32: path.join(process.env.APPDATA ?? '', 'Code/User/settings.json'),
+  }[process.platform] ?? path.join(home, '.config/Code/User/settings.json');
+
+  let label;
+  try {
+    label = JSON.parse(strip(fs.readFileSync(settings, 'utf8')))['workbench.colorTheme'];
+  } catch {
+    bail(`could not read ${settings}. Name a theme file instead.`);
+  }
+  if (!label) bail('no workbench.colorTheme in your settings. Name a theme file instead.');
+
+  // A theme is contributed by an extension, under a label that need not resemble the
+  // file name -- "Aether Neptune" lives in aether-neptune.json, but "Default Dark+"
+  // lives in dark_plus.json. The manifests are the only mapping there is.
+  const roots = [
+    path.join(home, '.vscode/extensions'),
+    {
+      darwin: '/Applications/Visual Studio Code.app/Contents/Resources/app/extensions',
+      win32: path.join(process.env.LOCALAPPDATA ?? '', 'Programs/Microsoft VS Code/resources/app/extensions'),
+    }[process.platform] ?? '/usr/share/code/resources/app/extensions',
+  ];
+
+  for (const root of roots) {
+    let entries = [];
+    try {
+      entries = fs.readdirSync(root);
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      const manifest = path.join(root, entry, 'package.json');
+      let contributed;
+      try {
+        contributed = JSON.parse(strip(fs.readFileSync(manifest, 'utf8')))?.contributes?.themes ?? [];
+      } catch {
+        continue;
+      }
+      for (const theme of contributed) {
+        if (theme.label === label || theme.id === label) {
+          console.log(`\x1b[2m${label}\x1b[0m`);
+          return [path.join(root, entry, theme.path)];
+        }
+      }
+    }
+  }
+  bail(`could not find the theme "${label}" among the installed extensions. Name its file instead.`);
+}
+
+function bail(message) {
+  console.error(`theme-check: ${message}`);
+  process.exit(1);
+}
+
+const files = process.argv.length > 2 ? process.argv.slice(2) : currentTheme();
+
+for (const file of files) {
   const theme = load(file);
   const foreground = theme.colors?.['editor.foreground'];
   const resolved = SCOPES.map(([label, ...scopes]) => [

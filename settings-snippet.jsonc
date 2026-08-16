@@ -21,8 +21,9 @@
     // #F8F8F2 -- its own editor foreground -- so a \def'ed macro is invisible as a
     // macro; #FD971F is Monokai's parameter orange, which TikZ does not otherwise use.
     // Ten of the 61 themes measured here need this. Run
-    //   ./tools/tm tools/theme-check.mjs <theme.json>
-    // to see which of a theme's tokens read as plain text, then add a block like this.
+    //   ./tools/tm tools/theme-check.mjs
+    // to see which of your current theme's tokens read as plain text, then add a block
+    // like this one, keyed by the theme's name.
     "[Monokai]": {
       "enabled": true,
       "rules": {

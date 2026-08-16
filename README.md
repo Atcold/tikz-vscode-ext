@@ -147,9 +147,24 @@ coordinate, and in ten of the 61 themes. Scopes that would survive Monokai
 (`entity.name.function.preprocessor` reads as text in only one theme of the 61) collide
 with the bare-option colour in 37, which is worse: TikZ code is mostly bare options.
 
-So this is fixed per theme, in your own settings, and `theme-check` names what needs
-fixing — it reports a token whose colour equals the editor foreground as plain text
-rather than as styled. `settings-snippet.jsonc` carries a worked example for Monokai.
+So this is fixed per theme, in your own settings. Run the checker with no arguments and
+it reports on the theme you are using:
+
+```sh
+./tools/tm tools/theme-check.mjs
+```
+
+```
+Monokai
+monokai-color-theme.json            5 distinct colours, 2 as plain text
+    - coordinate (#F8F8F2, the foreground)
+    - macro (semantic) (#F8F8F2, the foreground)
+```
+
+Anything it lists needs a colour of its own under a theme-name key in your settings.
+`settings-snippet.jsonc` carries a worked example for Monokai — the semantic tokens go in
+`editor.semanticTokenColorCustomizations`, the grammar ones in
+`editor.tokenColorCustomizations`.
 
 | Token | Scope |
 |---|---|
@@ -190,7 +205,10 @@ harness tokenises with the exact engine the editor uses.
 # what the semantic provider would highlight, without running VS Code
 ./tools/tm tools/symbols-check.mjs path/to/figure.tex --index path/to/latex
 
-# which of our scopes a theme actually has a colour for
+# which of our scopes your current theme actually has a colour for
+./tools/tm tools/theme-check.mjs
+
+# ...or any theme, by file
 ./tools/tm tools/theme-check.mjs ~/.vscode/extensions/*/themes/*.json
 ```
 
