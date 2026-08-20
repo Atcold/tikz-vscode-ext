@@ -37,6 +37,10 @@ for img in $(sed -n 's/.*](\(images\/[^)]*\)).*/\1/p' README.md | sort -u); do
   if [ -n "$slug" ] && [ -n "$sha" ]; then
     [ -n "$(git status --porcelain -- "$img")" ] &&
       echo "warning: $img has uncommitted changes; the packaged README will point at the committed one" >&2
+    # Fetching a pinned URL before its commit is pushed makes GitHub cache the 404, so
+    # the page stays broken for minutes after the push lands. Push first, then package.
+    [ -z "$(git branch -r --contains "$sha" 2>/dev/null)" ] &&
+      echo "warning: $sha is not on any remote yet; push before packaging or the image URL will 404" >&2
     sed -i '' "s|](${img})|](https://raw.githubusercontent.com/${slug}/${sha}/${img})|g" "$stage/extension/README.md"
   else
     sed -i '' "\|](${img})|d" "$stage/extension/README.md"
