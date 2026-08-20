@@ -25,15 +25,12 @@ trap 'rm -rf "$stage"' EXIT
 mkdir -p "$stage/extension"
 tar -cf - --exclude=.git --exclude='*.vsix' --exclude=__pycache__ . | (cd "$stage/extension" && tar -xf -)
 
-# The extension editor does not resolve relative image paths in a README, and an
-# absolute one would have the editor fetch over the network to draw a page for an
-# extension already on disk. So the packaged copy carries its images inline, and the
-# checked-in README keeps the relative paths GitHub renders.
-for img in $(sed -n 's/.*](\(images\/[^)]*\.png\)).*/\1/p' README.md | sort -u); do
-  b64=$(base64 < "$img" | tr -d '\n')
-  ext=${img##*.}
-  sed -i '' "s|](${img})|](data:image/${ext};base64,${b64})|g" "$stage/extension/README.md"
-done
+# The extension editor renders a README with a sanitiser that accepts only http(s) image
+# sources: a relative path draws a broken tile, and so does a data: URI. An absolute URL
+# would work and is what vsce would write, at the cost of the editor reaching over the
+# network to illustrate an extension already sitting on disk. So the packaged README goes
+# without the pictures, and the checked-in one keeps them for GitHub.
+sed -i '' '/^!\[.*](images\/.*)$/d' "$stage/extension/README.md"
 
 cat > "$stage/extension.vsixmanifest" <<XML
 <?xml version="1.0" encoding="utf-8"?>
