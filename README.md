@@ -8,7 +8,7 @@ figure you are editing.
 ![The same line with the extension on. \eps is amber where it is defined and where it is
 used, while \draw stays cyan; the arrow tip, the style, the dimension, the path join and
 the coordinate each take a colour of their
-own.](https://raw.githubusercontent.com/Atcold/tikz-vscode-ext/master/images/highlighting.png)
+own.](images/highlighting.png)
 
 Stock LaTeX grammars colour that as one undifferentiated line. Here `->` is an operator,
 `ultra thick` a style reference, `shorten >` a key, `1pt` a number with its unit, `--` a
