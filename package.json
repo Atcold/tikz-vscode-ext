@@ -1,7 +1,7 @@
 {
   "name": "tikz-vscode-ext",
   "displayName": "TikZ",
-  "description": "Highlighting, building and viewing TikZ figures inside LaTeX documents.",
+  "description": "Write TikZ figures in VS Code: syntax highlighting, and one key to build and preview the figure you are editing.",
   "version": "0.1.0",
   "icon": "images/icon.png",
   "publisher": "atcold",

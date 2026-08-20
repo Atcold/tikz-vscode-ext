@@ -1,7 +1,8 @@
 # TikZ for Visual Studio Code
 
-Syntax highlighting for TikZ inside LaTeX documents, with commands to build and view the
-figure you are editing.
+Write TikZ figures in VS Code: syntax highlighting, and one key to build and preview the
+figure you are editing. That is the first slice — more of the authoring side is on its
+way.
 
 Both TeXstudio and VS Code tokenise a `tikzpicture` as if it were plain LaTeX, so
 everything that carries meaning inside one — key/value pairs, dimensions and their units,
