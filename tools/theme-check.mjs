@@ -10,17 +10,19 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-// Each entry is the full scope set the grammar puts on one kind of token. Several
-// tokens carry more than one scope on purpose: the first says what the token *is* in
-// conventional TextMate terms, the rest are fallbacks that more themes happen to style.
-// A token counts as styled if any of its scopes resolves.
+// Each entry is the full scope stack the grammar puts on one kind of token, outermost
+// first. A space-separated `name` in a grammar is a nested stack, not a list of
+// alternatives, and the editor themes the DEEPEST scope that any rule matches -- so the
+// last entry here wins wherever the theme has a rule for it, and the ones before it are
+// consulted only when it does not. Getting that backwards is how this reported Monokai
+// as styling the option key when the editor was painting it as plain text.
 const SCOPES = [
   ['option key', 'entity.other.attribute-name.tikz', 'variable.other.property.tikz'],
   ['assignment', 'keyword.operator.assignment.tikz'],
   ['arrow tip', 'keyword.operator.arrow.tikz'],
   ['path join', 'keyword.operator.path.tikz'],
   ['dimension', 'constant.numeric.dimension.tikz'],
-  ['unit', 'keyword.other.unit.tikz', 'constant.numeric.dimension.tikz'],
+  ['unit', 'constant.numeric.dimension.tikz', 'keyword.other.unit.tikz'],
   ['bare option', 'support.function.tikz', 'entity.name.function.tikz'],
   ['path operator', 'keyword.control.path.tikz'],
   ['coordinate', 'variable.other.coordinate.tikz'],
@@ -172,7 +174,7 @@ for (const file of files) {
   const foreground = theme.colors?.['editor.foreground'];
   const resolved = SCOPES.map(([label, ...scopes]) => [
     label,
-    scopes.map((s) => resolve(theme, s)).find(Boolean) ?? null,
+    scopes.map((s) => resolve(theme, s)).filter(Boolean).pop() ?? null,
   ]);
   const missing = resolved.filter(([, c]) => !c || same(c, foreground));
   const colours = new Set(resolved.map(([, c]) => c).filter((c) => c && !same(c, foreground)));
