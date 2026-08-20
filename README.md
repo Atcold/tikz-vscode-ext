@@ -1,4 +1,4 @@
-# TikZ
+# TikZ for Visual Studio Code
 
 Syntax highlighting for TikZ inside LaTeX documents, with commands to build and view the
 figure you are editing.
