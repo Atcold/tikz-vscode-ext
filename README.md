@@ -11,7 +11,7 @@ path join, `(eps)` a coordinate and `\eps` a variable — because the file `\def
 lines up. Every token maps to a conventional TextMate scope with a `.tikz` suffix, so the
 colours come from whichever theme you use.
 
-![The same line with the extension on: \eps amber where it is defined and where it is used, \draw still cyan, and the arrow tip, style, dimension, path join and coordinate each with a colour of their own.](images/highlighting.png)
+![The same two lines with the extension on: \eps amber where it is defined and where it is used, \draw still cyan, and the arrow tip, the option key, the style, the dimension, the path join and the coordinate each with a colour of their own.](images/highlighting.png)
 
 ## Building a figure
 
