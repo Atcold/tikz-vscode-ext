@@ -13,6 +13,9 @@ colours come from whichever theme you use.
 
 ![The same two lines with the extension on: \eps amber where it is defined and where it is used, \draw still cyan, and the arrow tip, the option key, the style, the dimension, the path join and the coordinate each with a colour of their own.](images/highlighting.png)
 
+*The same two lines as the editor draws them: `\eps` is amber at its `\def` and again
+at its use, while `\draw` stays cyan — a distinction no grammar can make on its own.*
+
 ## Building a figure
 
 Bind the two commands to keys, in `keybindings.json`:
