@@ -3,6 +3,7 @@
   "displayName": "TikZ",
   "description": "Highlighting, building and viewing TikZ figures inside LaTeX documents.",
   "version": "0.1.0",
+  "icon": "images/icon.png",
   "publisher": "atcold",
   "private": true,
   "license": "MIT",
