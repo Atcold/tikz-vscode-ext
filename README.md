@@ -11,6 +11,32 @@ path join, `(eps)` a coordinate and `\eps` a variable — because the file `\def
 lines up. Every token maps to a conventional TextMate scope with a `.tikz` suffix, so the
 colours come from whichever theme you use.
 
+## Building a figure
+
+Bind the two commands to keys, in `keybindings.json`:
+
+```jsonc
+{ "key": "f6", "command": "runCommands",
+  "args": { "commands": ["workbench.action.files.saveAll", "tikz.build"] },
+  "when": "!terminalFocus" },
+{ "key": "f7", "command": "tikz.view", "when": "!terminalFocus" }
+```
+
+`F6` builds and reports the outcome in a notification; `F7` hands the PDF to an
+external viewer. Both act on the file you are looking at — one in a figure folder counts
+as a figure, anything else as the document.
+
+The extension does not build anything itself. `F6` runs a shell script from your
+project, because only your project knows which preamble a figure has to compile
+against, and guessing that is how a build tool becomes a build system. Copy
+`examples/fig.sh` and `examples/build.sh` into your project and change the preamble
+line. Each script is given the figure's path as `$1`, runs from the folder it was found
+in, and reports by writing one line to `build/.build-status`, either `ok <message>` or
+`fail <message>`; without that file the exit code is used. Press `F6` with no script in
+place and the editor will offer you the example.
+
+`TikZ: Rebuild style index` re-scans the workspace for `/.style` definitions.
+
 ## Install
 
 ```sh
@@ -22,15 +48,6 @@ Reload the window, then merge `settings-snippet.jsonc` into your user `settings.
 its `editor.semanticTokenColorCustomizations.enabled` line is required, as many themes
 ship semantic highlighting off. `./tools/tm tools/theme-check.mjs` reports the tokens
 your theme leaves the colour of ordinary text, to be given one there.
-
-## Commands
-
-`TikZ: Build and report` runs a script and reports the outcome — the script's own
-`ok <message>` or `fail <message>` line in `build/.build-status`, or the exit code.
-`TikZ: View the PDF` hands the output to an external viewer. Both act on the file you
-are looking at, one in a figure folder counting as a figure and anything else as the
-document, and both are worth a key. `TikZ: Rebuild style index` re-scans the workspace
-for `/.style` definitions.
 
 ## Settings
 

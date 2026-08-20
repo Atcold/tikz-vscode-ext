@@ -40,12 +40,12 @@ function config() {
  * it here removes all of that. The cost is losing the terminal transcript, which the
  * toast and the log file named in a failure already cover.
  *
- * Falls back to the default build task when no script is found, so the command still
- * does something sensible in a project that has none.
+ * A project with no script has not finished setting up rather than gone wrong, so that
+ * case asks for one instead of reporting a failure.
  */
-async function runBuildAndReport() {
+async function runBuildAndReport(context) {
   try {
-    await build();
+    await build(context);
   } catch (err) {
     // Bound to a key with no terminal behind it, so an unhandled throw would
     // otherwise surface as a bare stack trace with no clue which step failed.
@@ -53,7 +53,7 @@ async function runBuildAndReport() {
   }
 }
 
-async function build() {
+async function build(context) {
   const folder = vscode.workspace.workspaceFolders?.[0];
   if (!folder) {
     vscode.window.showErrorMessage('TikZ: no folder open, nothing to build.');
@@ -62,7 +62,7 @@ async function build() {
 
   const plan = await choose(folder.uri);
   if (!plan) {
-    await vscode.commands.executeCommand('workbench.action.tasks.build');
+    await askForScript(context);
     return;
   }
 
@@ -82,6 +82,25 @@ async function build() {
     const what = status?.message ?? plan.label;
     vscode.window.showInformationMessage(`Built ${what} in ${seconds}s`);
   }
+}
+
+/**
+ * The extension runs your build rather than owning one, since only the project knows
+ * which preamble a figure has to compile against. With no script there is nothing to
+ * run, which is a step not yet taken rather than an error, so it is said that way and
+ * the example is one click off.
+ * @param {vscode.ExtensionContext} context
+ */
+async function askForScript(context) {
+  const { figureScript, buildScript } = config();
+  const choice = await vscode.window.showInformationMessage(
+    `TikZ needs a build script: no ${figureScript} or ${buildScript} in this workspace. ` +
+      'The build command runs one of your own; copy an example to start.',
+    'Show example',
+  );
+  if (!choice) return;
+  const uri = vscode.Uri.joinPath(context.extensionUri, 'examples', 'fig.sh');
+  await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(uri));
 }
 
 /**

@@ -24,7 +24,7 @@ async function activate(context) {
   }
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('tikz.build', runBuildAndReport),
+    vscode.commands.registerCommand('tikz.build', () => runBuildAndReport(context)),
   );
 
   context.subscriptions.push(
