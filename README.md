@@ -20,6 +20,18 @@ scope with a `.tikz` suffix, so the colours come from whichever theme you use.
 *The same two lines as the editor draws them: `\eps` is amber at its `\def` and again
 at its use, while `\draw` stays cyan — a distinction no grammar can make on its own.*
 
+## Install
+
+```sh
+./tools/package
+code --install-extension tikz-vscode-ext-0.1.0.vsix
+```
+
+Reload the window, then merge `settings-snippet.jsonc` into your user `settings.json`;
+its `editor.semanticTokenColorCustomizations.enabled` line is required, as many themes
+ship semantic highlighting off. `./tools/tm tools/theme-check.mjs` reports the tokens
+your theme leaves the colour of ordinary text, to be given one there.
+
 ## Building a figure
 
 Bind the two commands to keys, in `keybindings.json`:
@@ -45,18 +57,6 @@ in, and reports by writing one line to `build/.build-status`, either `ok <messag
 place and the editor will offer you the example.
 
 `TikZ: Rebuild style index` re-scans the workspace for `/.style` definitions.
-
-## Install
-
-```sh
-./tools/package
-code --install-extension tikz-vscode-ext-0.1.0.vsix
-```
-
-Reload the window, then merge `settings-snippet.jsonc` into your user `settings.json`;
-its `editor.semanticTokenColorCustomizations.enabled` line is required, as many themes
-ship semantic highlighting off. `./tools/tm tools/theme-check.mjs` reports the tokens
-your theme leaves the colour of ordinary text, to be given one there.
 
 ## Layout
 
