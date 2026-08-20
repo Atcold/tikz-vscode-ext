@@ -49,6 +49,30 @@ its `editor.semanticTokenColorCustomizations.enabled` line is required, as many 
 ship semantic highlighting off. `./tools/tm tools/theme-check.mjs` reports the tokens
 your theme leaves the colour of ordinary text, to be given one there.
 
+## Layout
+
+What the defaults expect, all of it adjustable below:
+
+```
+your-project/
+└── latex/                  ← searched for the scripts: tikz.scriptFolders
+    ├── main.tex
+    ├── preamble.tex
+    ├── fig.sh              ← copied from examples/
+    ├── build.sh
+    ├── ch1-figs/           ← a figure folder: tikz.figureFolders
+    │   └── flowchart.tex
+    └── build/
+        ├── fig.pdf         ← tikz.figurePdf
+        ├── main.pdf        ← tikz.documentPdf
+        └── .build-status   ← what the script reports back
+```
+
+The scripts are looked for in each `tikz.scriptFolders` entry in turn and the first hit
+wins, so sources can sit in a subdirectory or at the root. A file counts as a figure when
+the name of the folder holding it matches `tikz.figureFolders`; the PDFs are resolved
+against the same folder as the scripts.
+
 ## Settings
 
 | Setting | Default | |
