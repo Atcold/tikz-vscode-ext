@@ -25,12 +25,23 @@ trap 'rm -rf "$stage"' EXIT
 mkdir -p "$stage/extension"
 tar -cf - --exclude=.git --exclude='*.vsix' --exclude=__pycache__ . | (cd "$stage/extension" && tar -xf -)
 
-# The extension editor renders a README with a sanitiser that accepts only http(s) image
-# sources: a relative path draws a broken tile, and so does a data: URI. An absolute URL
-# would work and is what vsce would write, at the cost of the editor reaching over the
-# network to illustrate an extension already sitting on disk. So the packaged README goes
-# without the pictures, and the checked-in one keeps them for GitHub.
-sed -i '' '/^!\[.*](images\/.*)$/d' "$stage/extension/README.md"
+# The extension editor sanitises a README down to http(s) image sources -- a relative
+# path draws a broken tile, and so does a data: URI with the image inside it. So the
+# staged README points at the raw file on GitHub, pinned to the commit that last touched
+# that file: a branch URL keeps serving a cached copy after the image is replaced, which
+# is how the page spent an afternoon showing the wrong screenshot. The checked-in README
+# keeps its relative paths, which is what GitHub renders.
+slug=$(git config --get remote.origin.url | sed -e 's|.*[:/]\([^/]*/[^/]*\)$|\1|' -e 's|\.git$||')
+for img in $(sed -n 's/.*](\(images\/[^)]*\)).*/\1/p' README.md | sort -u); do
+  sha=$(git log -1 --format=%H -- "$img")
+  if [ -n "$slug" ] && [ -n "$sha" ]; then
+    [ -n "$(git status --porcelain -- "$img")" ] &&
+      echo "warning: $img has uncommitted changes; the packaged README will point at the committed one" >&2
+    sed -i '' "s|](${img})|](https://raw.githubusercontent.com/${slug}/${sha}/${img})|g" "$stage/extension/README.md"
+  else
+    sed -i '' "\|](${img})|d" "$stage/extension/README.md"
+  fi
+done
 
 cat > "$stage/extension.vsixmanifest" <<XML
 <?xml version="1.0" encoding="utf-8"?>
