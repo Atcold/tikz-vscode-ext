@@ -1,6 +1,4 @@
-# tikz-vscode-ext
-
-Syntax highlighting for TikZ inside LaTeX documents, plus commands to build and view the
+Syntax highlighting for TikZ inside LaTeX documents, with commands to build and view the
 figure you are editing.
 
 ```tex

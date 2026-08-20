@@ -1,7 +1,7 @@
 {
   "name": "tikz-vscode-ext",
-  "displayName": "TikZ highlighting",
-  "description": "Fine-grained syntax highlighting for the TikZ graphical language inside LaTeX documents.",
+  "displayName": "TikZ",
+  "description": "Highlighting, building and viewing TikZ figures inside LaTeX documents.",
   "version": "0.1.0",
   "publisher": "atcold",
   "private": true,
