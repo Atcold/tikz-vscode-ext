@@ -5,16 +5,16 @@ figure you are editing.
 \draw [->, ultra thick, shorten >=1pt] (eps) -- (0,\eps);
 ```
 
-![The same line with the extension on. \eps is amber where it is defined and where it is
-used, while \draw stays cyan; the arrow tip, the style, the dimension, the path join and
-the coordinate each take a colour of their
-own.](images/highlighting.png)
-
 Stock LaTeX grammars colour that as one undifferentiated line. Here `->` is an operator,
 `ultra thick` a style reference, `shorten >` a key, `1pt` a number with its unit, `--` a
 path join, `(eps)` a coordinate and `\eps` a variable — because the file `\def`s it two
 lines up. Every token maps to a conventional TextMate scope with a `.tikz` suffix, so the
 colours come from whichever theme you use.
+
+![The same line with the extension on. \eps is amber where it is defined and where it is
+used, while \draw stays cyan; the arrow tip, the style, the dimension, the path join and
+the coordinate each take a colour of their
+own.](images/highlighting.png)
 
 ## Building a figure
 
