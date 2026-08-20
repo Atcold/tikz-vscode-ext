@@ -12,8 +12,10 @@ colour:
 
 Here `->` is an operator, `ultra thick` a style reference, `shorten >` a key, `1pt` a
 number with its unit, `--` a path join, `(eps)` a coordinate and `\eps` a variable —
-because the file `\def`s it two lines up. Every token maps to a conventional TextMate
-scope with a `.tikz` suffix, so the colours come from whichever theme you use.
+because the file `\def`s it two lines up. No palette ships with the extension: an option
+key is tagged as an attribute, a dimension as a number, a path operator as a keyword — the
+categories your theme already colours — so changing theme changes the highlighting with
+it.
 
 ![The same two lines with the extension on: \eps amber where it is defined and where it is used, \draw still cyan, and the arrow tip, the option key, the style, the dimension, the path join and the coordinate each with a colour of their own.](images/highlighting.png)
 
