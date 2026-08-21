@@ -13,6 +13,7 @@
       "patterns": [
         { "include": "#calc-coordinate" },
         { "include": "#maths" },
+        { "include": "#spacing" },
         { "include": "#option-list" },
         { "include": "#path-operator" },
         { "include": "#path-join" },
@@ -58,6 +59,12 @@
       ]
     },
 
+    "spacing": {
+      "comment": "TeX spacing macros, scoped as maths is. \\qquad between two \\(...\\) groups is not in maths -- it sits in text mode between them -- so the host grammar gives it support.function.general.tex, the same scope \\node and \\draw carry, and it comes out the colour of a path command in the middle of a label.\n\nSpacing in a label is content, not structure, so it takes the maths scope and merges with the formulas either side of it. The exact name string.other.math.tikz is deliberate rather than a spacing scope of its own: the point is to be indistinguishable from the maths it separates, and a distinct name is something a theme could colour differently.\n\nA closed vocabulary is safe here in a way it would not be for #key: none of these is ever a TikZ path construct, and TeX is not going to grow more of them.",
+      "match": "(?<!\\\\)\\\\(?:qquad|quad|enspace|thinspace|medspace|thickspace|neg(?:thin|med|thick)space|hfill|vfill|hspace\\*?|vspace\\*?|smallskip|medskip|bigskip)(?![A-Za-z@])|(?<!\\\\)\\\\[,;:!]",
+      "name": "string.other.math.tikz"
+    },
+
     "comment": {
       "comment": "Opening a block below takes tokenisation of its interior away from the host, so comments inside an option list are ours to handle.",
       "match": "(%).*$",
@@ -87,6 +94,7 @@
         { "include": "#colour-after-mix" },
         { "include": "#colour-before-mix" },
         { "include": "#number" },
+        { "include": "#spacing" },
         { "include": "#macro" },
         { "include": "#value-group" },
         { "include": "#option-list" },

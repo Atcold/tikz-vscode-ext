@@ -1,0 +1,11 @@
+% TeX spacing macros take the maths scope, so \qquad between two formulas merges with
+% them instead of reading as a path command. The control is the first node: spacing
+% *inside* a formula must stay part of the one flat string, which the -string negation
+% on the injection selector is what guarantees.
+\begin{tikzpicture}
+  \node at (0,0) {\(a\,b\quad c\)};
+  \node at (1,1) {\(x\)\qquad\(y\)};
+  \node at (2,2) {\(p\)\hspace{1cm}\(q\)};
+  \node at (3,3) {left\hfill right};
+  \draw (0,0) -- (1,1);
+\end{tikzpicture}
