@@ -1,0 +1,16 @@
+% calc coordinates: ($...$) is coordinate arithmetic, not maths. Every dollar here is a
+% delimiter TikZ requires, and none of them opens a formula. The last two lines are the
+% control: real maths, which must still come out as a string.
+\begin{tikzpicture}
+  \draw [colorgrey, opacity=.85, line width=.6pt]
+    ($(bbus)+(-1mm,-1.5mm)$) -- ($(bbus)+(1mm,1.5mm)$);
+  \node [arg, anchor=south] at ($(bbus)+(0,1.5mm)$) {\(\cK\)};
+  \node at ($(a)!.5!(b)$) {partway};
+  \node at ($(a)!.5!90:(b)$) {partway, rotated};
+  \draw ($(a)+(1,0)$) circle (2pt);
+  \draw ($2*(a)-(b)/3$) -- ($(a)+(\dx,0)$);
+  \draw ($($(a)+(b)$)+(0,1)$) -- (c);
+  \node [label={[shift={($(a)+(0,2mm)$)}]above:$y$}] at (0,0) {};
+  \node at (1,1) {$x^2$};
+  \node at (2,2) {\(\alpha\)};
+\end{tikzpicture}

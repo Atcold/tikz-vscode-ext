@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "scopeName": "tikz.injection",
-  "comment": "Injected into the stock LaTeX grammar wherever it has already established a tikzpicture. The negations matter: inside a tikzpicture, maths, comments and verbatim are ordinary LaTeX and must be left alone, and excluding them here is what keeps every rule below free of guards.",
-  "injectionSelector": "L:meta.function.environment.latex.tikz -meta.math -comment -string -markup.raw",
+  "comment": "Injected into the stock LaTeX grammar wherever it has already established a tikzpicture. The negations matter: inside a tikzpicture, maths, comments and verbatim are ordinary LaTeX and must be left alone, and excluding them here is what keeps every rule below free of guards. The last one negates a scope of our own -- see #calc-coordinate, which needs the injection to stop re-entering a region this grammar has already claimed.",
+  "injectionSelector": "L:meta.function.environment.latex.tikz -meta.math -comment -string -markup.raw -meta.coordinate.calc.tikz",
 
   "patterns": [ { "include": "#picture-body" } ],
 
@@ -11,6 +11,7 @@
     "picture-body": {
       "comment": "Path level: what a tikzpicture body looks like outside an option list. Shared with the toplevel grammar so an inline \\tikz...; one-liner is tokenised identically.",
       "patterns": [
+        { "include": "#calc-coordinate" },
         { "include": "#maths" },
         { "include": "#option-list" },
         { "include": "#path-operator" },
@@ -76,6 +77,7 @@
     "option-body": {
       "patterns": [
         { "include": "#comment" },
+        { "include": "#calc-coordinate" },
         { "include": "#maths" },
         { "include": "#style-handle" },
         { "include": "#key" },
@@ -153,6 +155,41 @@
           "name": "keyword.control.path.tikz"
         }
       ]
+    },
+
+    "calc-coordinate": {
+      "comment": "($(a)+(1mm,0)$) is the calc library's coordinate arithmetic, not maths. The dollars are calc's own delimiters -- TikZ requires them and there is no formula between them -- so #maths was flattening a whole coordinate expression into one string, and a figure full of ($...$) offsets read as a figure full of labels.\n\nListed before #maths and #coordinate in both bodies, because TextMate takes the earliest match: #coordinate would claim the opening parenthesis and leave the dollar to #maths, which is exactly the bug. Matching '(' and '$' together is also what keeps this off ordinary maths -- a bare $x$ has no parenthesis in front of it and is left to #maths as before.\n\nThe dollars take the coordinate parenthesis scopes rather than one of their own, so '($' and '$)' each read as a single delimiter in the theme the parentheses already use, and no new rule is needed in settings-snippet.jsonc.\n\ncontentName is load-bearing, not decoration. An L: injection re-applies wherever its selector still matches, and the scope stack inside this block is still a tikzpicture -- so #maths was being injected back in on top of our own patterns, matching the closing '$' before the end pattern could and running the rest of the line into a string. Naming the region and negating that name in the injectionSelector is what keeps the interior ours, the same trick #maths already relies on with -string.",
+      "begin": "(?<!\\\\)(\\()\\s*(\\$)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.section.coordinate.begin.tikz" },
+        "2": { "name": "punctuation.section.coordinate.begin.tikz" }
+      },
+      "end": "(\\$)\\s*(\\))|(?=\\\\end\\{)",
+      "endCaptures": {
+        "1": { "name": "punctuation.section.coordinate.end.tikz" },
+        "2": { "name": "punctuation.section.coordinate.end.tikz" }
+      },
+      "contentName": "meta.coordinate.calc.tikz",
+      "patterns": [ { "include": "#calc-body" } ]
+    },
+
+    "calc-body": {
+      "comment": "What may appear between calc's dollars: coordinates, lengths, plain numbers and the operators joining them. #calc-coordinate comes first so a nested ($...$) is reopened rather than read as a coordinate; #dimension and #number come before #calc-operator so the sign in (-1mm,-1.5mm) stays with its number instead of being taken for subtraction.",
+      "patterns": [
+        { "include": "#calc-coordinate" },
+        { "include": "#coordinate" },
+        { "include": "#dimension" },
+        { "include": "#number" },
+        { "include": "#calc-operator" },
+        { "include": "#separator" },
+        { "include": "#macro" }
+      ]
+    },
+
+    "calc-operator": {
+      "comment": "Addition and subtraction of coordinates, scalar '*' and '/', and the partway modifier '!' with the ':' that introduces its angle, as in ($(a)!.5!90:(b)$).",
+      "match": "[-+*/!:]",
+      "name": "keyword.operator.calc.tikz"
     },
 
     "coordinate": {
