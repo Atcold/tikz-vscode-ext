@@ -122,6 +122,15 @@
           "settings": { "foreground": "#7bb0d6" }
         },
         {
+          // The name inside the parentheses, one tint lighter than they are, so the two
+          // read as a single coordinate: muted chrome, brighter content. Monokai and many
+          // others style bare `variable` as the editor foreground, which leaves a
+          // coordinate name indistinguishable from ordinary prose.
+          "name": "TikZ: coordinate name",
+          "scope": "variable.other.coordinate.tikz",
+          "settings": { "foreground": "#A9CCE4" }
+        },
+        {
           "name": "TikZ: value braces { }",
           "scope": [
             "punctuation.section.group.begin.tikz",
