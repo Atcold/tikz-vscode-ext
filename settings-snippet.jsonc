@@ -43,6 +43,24 @@
   },
 
   // ---------------------------------------------------------------------------------
+  // REQUIRED for the punctuation colours further down to be visible at all.
+  //
+  // editor.bracketPairColorization is on by default, and paints ( ) [ ] { } by nesting
+  // depth -- gold, orchid, blue -- overriding whatever a textMateRule says. It knows
+  // nothing about TikZ: a coordinate parenthesis, an option bracket and a value brace all
+  // come out the same three rotating colours, and the three rules at the end of this file
+  // are silently discarded. The ';' rule appears to work only because a semicolon is not
+  // a bracket -- and so does the '$' of a calc coordinate, which is why ($ can end up
+  // half gold and half blue.
+  //
+  // Emptying the list for LaTeX alone turns it off here and leaves rainbow brackets on in
+  // every other language.
+  // ---------------------------------------------------------------------------------
+  "[latex]": {
+    "editor.language.colorizedBracketPairs": []
+  },
+
+  // ---------------------------------------------------------------------------------
   // OPTIONAL. Delete this whole block if you would rather stay purely theme-driven.
   //
   // The maths rules below are not optional if you dislike bold maths; the punctuation
